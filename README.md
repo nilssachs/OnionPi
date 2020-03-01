@@ -5,7 +5,7 @@ Using a Raspberry Pi as Sensor feeding into a Security Onion Server
 
 # Upgrade and Change Hostname
 apt update && apt upgrade
- sudo nano /etc/hostname
+sudo nano /etc/hostname
 	onionpi
   
 # Install Software Packages
@@ -47,7 +47,7 @@ nano /etc/network/interfaces
 	  # Disable IPv6:
 	  post-up echo 1 > /proc/sys/net/ipv6/conf/$IFACE/disable_ipv6
     
-6. Install Snort
+# Install Snort
 apt-get install -y build-essential libpcap-dev libpcre3-dev libdumbnet-dev bison flex zlib1g-dev liblzma-dev openssl libssl-dev libnghttp2-dev libluajit-5.1-dev libtool
 mkdir snort
 wget https://snort.org/downloads/snort/daq-2.0.6.tar.gz
@@ -66,30 +66,30 @@ sudo make install
 sudo ldconfig
 sudo ln -s /nsm/snort/bin/snort /usr/sbin/snort
 
-7. Snort Config
+# Snort Config
 sudo groupadd nsm
 sudo useradd nsm -r -s /sbin/nologin -c NSM_USER -g nsm
-# Create the Snort directories:
+#Create the Snort directories:
 sudo mkdir /nsm/snort/rules
 sudo mkdir /nsm/snort/rules/iplists
 sudo mkdir /nsm/snort/preproc_rules
 sudo mkdir /nsm/snort/lib/snort_dynamicrules
 sudo mkdir /nsm/snort/so_rules
-# Create some files that stores rules and ip lists
+#Create some files that stores rules and ip lists
 sudo touch /nsm/snort/rules/iplists/black_list.rules
 sudo touch /nsm/snort/rules/iplists/white_list.rules
 sudo touch /nsm/snort/rules/local.rules
 sudo touch /nsm/snort/sid-msg.map
-# Create our logging directories:
+#Create our logging directories:
 sudo mkdir /var/log/snort
 sudo mkdir /var/log/snort/archived_logs
-# Adjust permissions:
+#Adjust permissions:
 sudo chmod -R 5775 /nsm/snort
 sudo chmod -R 5775 /var/log/snort
 sudo chmod -R 5775 /var/log/snort/archived_logs
 sudo chmod -R 5775 /nsm/snort/so_rules
 sudo chmod -R 5775 /nsm/snort/lib/snort_dynamicrules
-# Change Ownership on folders:
+#Change Ownership on folders:
 sudo chown -R nsm:nsm /nsm/snort
 sudo chown -R nsm:nsm /var/log/snort
 sudo chown -R nsm:nsm /nsm/snort/lib/snort_dynamicrules
@@ -115,7 +115,7 @@ nano /nsm/snort/snort.conf
 	dynamicdetection directory /nsm/snort/lib/snort_dynamicrules	
 	output unified2: filename snort.u2, limit 128
   
-8. Barnyard Install
+# Barnyard Install
 sudo apt install tcl tcl8.6-dev tcl-tls
 cd /home/pi/tmp
 wget https://github.com/firnsy/barnyard2/archive/master.tar.gz -O barnyard2-Master.tar.gz
@@ -128,8 +128,8 @@ sudo ldconfig
 make
 sudo make install
 sudo cp /home/pi/tmp/barnyard2-master/etc/barnyard2.conf /nsm/snort/ 
-# the /var/log/barnyard2 folder is never used or referenced
-# but barnyard2 will error without it existing
+#the /var/log/barnyard2 folder is never used or referenced
+#but barnyard2 will error without it existing
 sudo mkdir /var/log/barnyard2
 sudo chown nsm:nsm /var/log/barnyard2 
 sudo touch /nsm/snort/barnyard2.waldo
@@ -140,7 +140,7 @@ autoreconf -ivf
 make
 sudo make install
 
-9. Snort Service
+# Snort Service
 nano /lib/systemd/system/snort.service
 	[Unit]
 	Description=Snort NIDS Daemon
@@ -176,7 +176,7 @@ nano /lib/systemd/system/snortagent.service
 	WantedBy=multi-user.target
 systemctl enable snortagent.service	
 
-10. Install Zeek
+# Install Zeek
 wget https://www.zeek.org/downloads/zeek-3.0.1.tar.gz
 tar xvzf zeek-3.0.1.tar.gz
 cd zeek-3.0.1
@@ -245,7 +245,7 @@ sudo nano /lib/systemd/system/zeek.service
 sudo systemctl enable zeek.service
 sudo systemctl start zeek.service
 		
-11. Configure SSH – Autossh
+# Configure SSH – Autossh
 ssh-keygen
 ssh-copy-id -i /root/.ssh/id_rsa.pub user@server
 ssh user@server -for testing
@@ -266,7 +266,7 @@ sudo ln -s /lib/systemd/system/autossh.service /etc/systemd/system/autossh.servi
 sudo systemctl daemon-reload
 sudo systemctl enable autossh
 
-12. Install Syslog-NG
+# Install Syslog-NG
 sudo apt install syslog-ng
 sudo nano /etc/syslog-ng/syslog-ng.conf
 	##see syslog.conf
@@ -287,7 +287,7 @@ sudo nano /lib/systemd/system/syslog-ng.service
 sudo systemctl daemon-reload
 sudo systemctl restart syslog-ng
 
-13. (Optional) Install Intel Stack
+# (Optional) Install Intel Stack
 Register and Create API Key
 curl https://packagecloud.io/install/repositories/intelstack/client/script.deb.sh | sudo bash
 sudo apt-get install intel-stack-client
@@ -313,12 +313,12 @@ sudo nano /nsm/zeek/share/zeek/site/local.zeek
 	};
 systemctl restart zeek
 
-14. (Optional) Install nProbe
+# (Optional) Install nProbe
 wget http://packages.ntop.org/RaspberryPI/apt-ntop_1.0.190416-469_all.deb
 sudo dpkg -i apt-ntop_1.0.190416-469_all.deb
 sudo apt-get install nprobe
 
-15. (Optional) Additional ICS Zeek Packages
+# (Optional) Additional ICS Zeek Packages
 wget https://bootstrap.pypa.io/get-pip.py
 python get-pip.py
 pip install GitPython
@@ -340,16 +340,16 @@ zkg install zeek-plugin-tds
 sudo nano /nsm/zeek/share/zeek/site/local.zeek
 	add "@load packages"
   
-16. Install Salt
+# Install Salt
 On Sensor:
 apt install salt-minion
 echo "master: <ServerIP>" | sudo tee -a /etc/salt/minion.d/onionsalt.conf
 sudo service salt-minion restart
 On Master:
-# Edit /opt/onionsalt/salt/top.sls and add the new minion as a "sensor"
-# list the salt keys:
+#Edit /opt/onionsalt/salt/top.sls and add the new minion as a "sensor"
+#list the salt keys:
 sudo salt-key -L
-# You should see an unaccepted salt key for the sensor, add it:
+#You should see an unaccepted salt key for the sensor, add it:
 sudo salt-key -a '*'
-# Verify that the master can communicate with all minions:
+#Verify that the master can communicate with all minions:
 sudo salt '*' test.ping
