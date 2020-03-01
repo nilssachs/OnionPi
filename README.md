@@ -1,17 +1,17 @@
 # OnionPi
 Using a Raspberry Pi as Sensor feeding into a Security Onion Server
 
-1. Install Raspbian Buster
+# Install Raspbian Buster
 
-2. Upgrade and Change Hostname
+# Upgrade and Change Hostname
 apt update && apt upgrade
  sudo nano /etc/hostname
 	onionpi
   
-3. Install Software Packages
+# Install Software Packages
 apt install git raspberrypi-kernel-headers cmake make gcc g++ flex bison libpcap-dev libssl-dev python-dev swig zlib1g-dev autoconf
 
-4. Install PF_RING
+# Install PF_RING
 git clone https://github.com/ntop/PF_RING.git
 cd PF_RING/kernel
 make
@@ -29,12 +29,12 @@ cd ../tcpdump-4.9.2
 make
 make install
 
-5. Network Config
+# Network Config
 nano /etc/network/interfaces
 	allow-hotplug lo
 	iface lo inet loopback
 
-	# Configure Management interface using DHCP 
+	#Configure Management interface using DHCP 
 	allow-hotplug eth0
 	iface eth0 inet dhcp
 	allow-hotplug eth1
